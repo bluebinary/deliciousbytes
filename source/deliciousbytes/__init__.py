@@ -53,7 +53,11 @@ class Int(int):
     def __new__(cls, value, base: int = 10, **kwargs):
         logger.debug(
             "%s.__new__(cls: %s, value: %s, base: %s, kwargs: %s)",
-            cls.__name__, cls, value, base, kwargs,
+            cls.__name__,
+            cls,
+            value,
+            base,
+            kwargs,
         )
 
         if not isinstance(value, (int, float, str, bytes, bytearray)):

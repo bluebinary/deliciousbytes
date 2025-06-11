@@ -25,7 +25,7 @@ the ability to encode and decode bytes and string values with a defined endianne
 ### Requirements
 
 The DeliciousBytes library has been tested with Python 3.10, 3.11, 3.12 and 3.13. The
-library has not been tested with and may not be compatible with Python 3.9 or earlier.
+library has not been tested with and is likely incompatible with Python 3.9 and earlier.
 
 ### Installation
 
