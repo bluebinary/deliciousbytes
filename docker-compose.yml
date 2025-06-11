@@ -1,0 +1,29 @@
+x-volumes: &volumes
+  - ./README.md:/README.md
+  - ./source/deliciousbytes:/source/deliciousbytes
+  - ./source/deliciousbytes:/usr/local/lib/python/site-packages/deliciousbytes
+  - ./tests:/tests
+
+services:
+
+  black:
+    container_name: deliciousbytes-black
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: xml-black
+    environment:
+      - SERVICE=black
+    volumes:
+      *volumes
+
+  tests:
+    container_name: deliciousbytes-tests
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: xml-tests
+    environment:
+      - SERVICE=tests
+    volumes:
+      *volumes
