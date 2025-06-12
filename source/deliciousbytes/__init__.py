@@ -73,53 +73,11 @@ class Int(int):
         elif isinstance(value, (str, bytes, bytearray)):
             return super().__new__(cls, value, base=base)
 
-    def __init__(cls, *args, **kwargs):
-        pass
-
     def __bytes__(self) -> bytes:
         return self.encode()
 
     def __len__(self) -> int:
         return len(bytes(self))
-
-    @property
-    def length(self) -> int:
-        """Return the number of bytes that are used to hold the value."""
-        return self._length
-
-    @property
-    def signed(self) -> bool:
-        """Return whether the type is signed or not."""
-        return self._signed
-
-    @property
-    def order(self) -> ByteOrder:
-        """Return the current byte order associated with the type."""
-
-        return self._order
-
-    @order.setter
-    def order(self, order: ByteOrder):
-        """Support changing the byte order used to encode the type."""
-
-        if not isinstance(order, ByteOrder):
-            raise TypeError(
-                "The 'order' argument must have a ByteOrder enumeration value!"
-            )
-
-        self._order = order
-
-    @classmethod
-    @property
-    def MIN(cls) -> int:
-        """Return the minimum value that can be held by the type."""
-        return cls._minimum
-
-    @classmethod
-    @property
-    def MAX(cls) -> int:
-        """Return the maximum value that can be held by the type."""
-        return cls._maximum
 
     def __getitem__(self, key: int) -> bytes:
         """Support obtaining individual bytes from the encoded version of the value."""
@@ -141,36 +99,6 @@ class Int(int):
 
     def __delitem__(self, key: int, value: int):
         raise NotImplementedError
-
-    def encode(self, order: ByteOrder = None) -> bytes:
-        if order is None:
-            order = self.order
-        elif not isinstance(order, ByteOrder):
-            raise TypeError(
-                "The 'order' argument must have a ByteOrder enumeration value!"
-            )
-
-        return self.to_bytes(
-            length=self.length, byteorder=order.value, signed=self.signed
-        )
-
-    @classmethod
-    def decode(cls, value: bytes, order: ByteOrder = ByteOrder.MSB) -> Int:
-        if not isinstance(value, bytes):
-            raise TypeError("The 'value' argument must have a bytes value!")
-
-        if not isinstance(order, ByteOrder):
-            raise TypeError(
-                "The 'order' argument must have a ByteOrder enumeration value!"
-            )
-
-        decoded = cls(int.from_bytes(value, byteorder=order.value, signed=cls._signed))
-
-        logger.debug(
-            "%s.decode(value: %r, order: %r) => %r", cls.__name__, value, order, decoded
-        )
-
-        return decoded
 
     def __add__(self, other: int) -> Int:
         """Addition"""
@@ -327,6 +255,75 @@ class Int(int):
     def __invert__(self) -> Int:
         """Unary invert"""
         return self.__class__(~int(self))
+
+    @property
+    def length(self) -> int:
+        """Return the number of bytes that are used to hold the value."""
+        return self._length
+
+    @property
+    def signed(self) -> bool:
+        """Return whether the type is signed or not."""
+        return self._signed
+
+    @property
+    def order(self) -> ByteOrder:
+        """Return the current byte order associated with the type."""
+
+        return self._order
+
+    @order.setter
+    def order(self, order: ByteOrder):
+        """Support changing the byte order used to encode the type."""
+
+        if not isinstance(order, ByteOrder):
+            raise TypeError(
+                "The 'order' argument must have a ByteOrder enumeration value!"
+            )
+
+        self._order = order
+
+    @classmethod
+    @property
+    def MIN(cls) -> int:
+        """Return the minimum value that can be held by the type."""
+        return cls._minimum
+
+    @classmethod
+    @property
+    def MAX(cls) -> int:
+        """Return the maximum value that can be held by the type."""
+        return cls._maximum
+
+    def encode(self, order: ByteOrder = None) -> bytes:
+        if order is None:
+            order = self.order
+        elif not isinstance(order, ByteOrder):
+            raise TypeError(
+                "The 'order' argument must have a ByteOrder enumeration value!"
+            )
+
+        return self.to_bytes(
+            length=self.length, byteorder=order.value, signed=self.signed
+        )
+
+    @classmethod
+    def decode(cls, value: bytes, order: ByteOrder = ByteOrder.MSB) -> Int:
+        if not isinstance(value, bytes):
+            raise TypeError("The 'value' argument must have a bytes value!")
+
+        if not isinstance(order, ByteOrder):
+            raise TypeError(
+                "The 'order' argument must have a ByteOrder enumeration value!"
+            )
+
+        decoded = cls(int.from_bytes(value, byteorder=order.value, signed=cls._signed))
+
+        logger.debug(
+            "%s.decode(value: %r, order: %r) => %r", cls.__name__, value, order, decoded
+        )
+
+        return decoded
 
 
 class Int8(Int):
@@ -641,25 +638,46 @@ class String(str):
     def __new__(cls, value: str, *args, **kwargs):
         return super().__new__(cls, value, *args, **kwargs)
 
-    def __init__(cls, *args, **kwargs):
-        pass
-
     def encode(
-        self, order: ByteOrder = ByteOrder.MSB, encoding: Encoding = Encoding.Unicode
+        self,
+        order: ByteOrder = ByteOrder.MSB,
+        encoding: Encoding = Encoding.Unicode,
     ):
+        if not isinstance(encoding, Encoding):
+            raise TypeError(
+                "The 'encoding' argument must reference an Encoding enumeration option!"
+            )
+
         if order is ByteOrder.MSB:
             return bytes(bytearray(str.encode(self, encoding.value)))
         elif order is ByteOrder.MSB:
             return bytes(reversed(bytearray(str.encode(self, encoding.value))))
         else:
             raise TypeError(
-                "The 'order' argument is invalid; it must have a 'ByteOrder' enumeration value, not: %s!"
-                % (type(order))
+                "The 'order' argument must reference a ByteOrder enumeration option!"
             )
 
     @classmethod
-    def decode(cls, value: bytes, encoding: Encoding = Encoding.Unicode) -> String:
+    def decode(
+        cls,
+        value: bytes,
+        order: ByteOrder = ByteOrder.MSB,
+        encoding: Encoding = Encoding.Unicode,
+    ) -> String:
         if not isinstance(value, bytes):
             raise TypeError("The 'value' argument must have a 'bytes' value!")
+
+        if not isinstance(order, ByteOrder):
+            raise TypeError(
+                "The 'order' argument must reference a ByteOrder enumeration option!"
+            )
+
+        if not isinstance(encoding, Encoding):
+            raise TypeError(
+                "The 'encoding' argument must reference an Encoding enumeration option!"
+            )
+
+        if order is ByteOrder.LSB:
+            value = bytes(reversed(bytearray(value)))
 
         return String(value.decode(encoding.value))

@@ -1,6 +1,14 @@
+# Compiled Python Bytecode
+*.pyc
+
+# Build Artifacts & Cache Files
 **/distribution
 **/dist
 **/*.egg-info
 **/__pycache__
 **/.pytest_cache
 **/.DS_Store
+
+# Environment Files
+.env
+!.env.*

@@ -243,3 +243,28 @@ def test_bytes64():
     encoded: bytes = value.encode(order=ByteOrder.LSB)
     assert isinstance(encoded, bytes)
     assert encoded == b"\x32\x09\x3d\x00\x00\x00\x00\x00"
+
+
+def test_string():
+    uncoded: String = String("hello")
+
+    assert isinstance(uncoded, String)
+    assert isinstance(uncoded, str)
+
+    # As String is a subclass of 'str' we can compare values directly
+    assert uncoded == "hello"
+
+    encoded: bytes = uncoded.encode(order=ByteOrder.MSB)
+
+    assert isinstance(encoded, bytes)
+    assert encoded == b"hello"
+
+    decoded = String.decode(b"hello")
+
+    assert isinstance(decoded, String)
+    assert isinstance(decoded, str)
+
+    # As String is a subclass of 'str' we can compare values directly
+    assert decoded == "hello"
+    assert decoded.encode() == b"hello"
+ 
