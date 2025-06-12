@@ -267,4 +267,3 @@ def test_string():
     # As String is a subclass of 'str' we can compare values directly
     assert decoded == "hello"
     assert decoded.encode() == b"hello"
- 
