@@ -9,6 +9,8 @@ import sys
 import math
 import builtins
 
+from classicist import classproperty
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +48,7 @@ class ByteOrder(enumerific.Enumeration, aliased=True):
     Big = MSB
     Little = LSB
 
-    @classmethod
-    @property
+    @classproperty
     def Native(cls) -> ByteOrder:
         if sys.byteorder == "big":
             return ByteOrder.MSB
@@ -64,20 +65,17 @@ class Type(object):
     _format: str = None
     _order: ByteOrder = None
 
-    @classmethod
-    @property
+    @classproperty
     def length(cls) -> int | None:
         """Return the number of bytes that are used to hold the value."""
         return cls._length
 
-    @classmethod
-    @property
+    @classproperty
     def signed(cls) -> bool | None:
         """Return whether the type is signed or not."""
         return cls._signed
 
-    @classmethod
-    @property
+    @classproperty
     def format(cls) -> str | None:
         """Return the format character used for the type in the struct module if set."""
         return cls._format
@@ -328,14 +326,12 @@ class Int(int, Type):
         """Unary invert"""
         return self.__class__(~int(self))
 
-    @classmethod
-    @property
+    @classproperty
     def MIN(cls) -> int:
         """Return the minimum value that can be held by the type."""
         return cls._minimum
 
-    @classmethod
-    @property
+    @classproperty
     def MAX(cls) -> int:
         """Return the maximum value that can be held by the type."""
         return cls._maximum
@@ -885,14 +881,12 @@ class Float(float, Type):
         """Unary invert"""
         return self.__class__(~float(self))
 
-    @classmethod
-    @property
+    @classproperty
     def MIN(cls) -> float:
         """Return the minimum value that can be held by the type."""
         return cls._minimum
 
-    @classmethod
-    @property
+    @classproperty
     def MAX(cls) -> float:
         """Return the maximum value that can be held by the type."""
         return cls._maximum
@@ -1073,8 +1067,7 @@ class String(str, Type):
     def __new__(cls, value: str, *args, **kwargs):
         return super().__new__(cls, value, *args, **kwargs)
 
-    @classmethod
-    @property
+    @classproperty
     def encoding(cls) -> Encoding:
         return cls._encoding
 
