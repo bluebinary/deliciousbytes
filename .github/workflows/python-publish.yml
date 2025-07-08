@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
-          # name: enumerific-${{ github.event.release.name }}
+          # name: deliciousbytes-${{ github.event.release.name }}
           path: dist/
 
   pypi-publish:
@@ -60,7 +60,7 @@ jobs:
     # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
     environment:
       name: pypi
-      url: https://pypi.org/project/enumerific/${{ github.event.release.name }}
+      url: https://pypi.org/project/deliciousbytes/${{ github.event.release.name }}
 
     steps:
       - name: Retrieve release distributions
