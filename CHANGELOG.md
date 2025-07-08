@@ -1,5 +1,19 @@
 # DeliciousBytes Library Change Log
 
+## [1.0.3] - 2025-07-07
+### Added
+- Input validation for the `.encode()` methods.
+- Additional unit testing for the `UnsignedLong` type.
+- A new `utilities` sub-module containing the `hexbytes` helper method that can be used
+to format raw `bytes` or `bytearray` values into hexadecimal encoded strings for review,
+and the `print_hexbytes` helper method that can be used to print such strings.
+
+### Changed
+- Type casting of the decoded return value for the `Bytes` class when reversed back to a
+`bytes` type, fixing a previous issue where the reversed return type was a `list` type.
+- The `BytesView` class `split` length can now be equal to the length of the `data`.
+- Corrected type hints for the `BytesView` class' `__iter__` and `__next__` methods.
+
 ## [1.0.2] - 2025-06-17
 ### Added
 - Added support for creating `Bytes` values from `bytes` values.
