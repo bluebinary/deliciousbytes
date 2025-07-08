@@ -11,6 +11,7 @@ import builtins
 
 from classicist import classproperty
 
+from deliciousbytes.utilities import hexbytes
 
 logger = logging.getLogger(__name__)
 
@@ -337,6 +338,11 @@ class Int(int, Type):
         return cls._maximum
 
     def encode(self, order: ByteOrder = None) -> bytes:
+        if not isinstance(self, Int):
+            raise TypeError(
+                "Ensure the 'encode' method is being called on a class instance!"
+            )
+
         if order is None:
             order = self.order
         elif not isinstance(order, ByteOrder):
@@ -346,7 +352,9 @@ class Int(int, Type):
 
         if self.length > 0:
             return self.to_bytes(
-                length=self.length, byteorder=order.value, signed=self.signed
+                length=self.length,
+                byteorder=order.value,
+                signed=self.signed,
             )
         else:
             return self.to_bytes(
@@ -372,7 +380,11 @@ class Int(int, Type):
         )
 
         logger.debug(
-            "%s.decode(value: %r, order: %r) => %r", cls.__name__, value, order, decoded
+            "%s.decode(value: %r, order: %r) => %r",
+            cls.__name__,
+            hexbytes(value),
+            order,
+            decoded,
         )
 
         return decoded
@@ -892,6 +904,11 @@ class Float(float, Type):
         return cls._maximum
 
     def encode(self, order: ByteOrder = ByteOrder.MSB) -> bytes:
+        if not isinstance(self, Float):
+            raise TypeError(
+                "Ensure the 'encode' method is being called on a class instance!"
+            )
+
         if not isinstance(order, ByteOrder):
             raise TypeError(
                 "The 'order' argument must reference a ByteOrder enumeration option!"
@@ -982,6 +999,11 @@ class Bytes(bytes, Type):
     def encode(
         self, order: ByteOrder = ByteOrder.MSB, length: int = None, raises: bool = True
     ) -> bytes:
+        if not isinstance(self, Bytes):
+            raise TypeError(
+                "Ensure the 'encode' method is being called on a class instance!"
+            )
+
         if not isinstance(order, ByteOrder):
             raise TypeError(
                 "The 'order' argument must have a ByteOrder enumeration value!"
@@ -1030,7 +1052,7 @@ class Bytes(bytes, Type):
             )
 
         if order is ByteOrder.LSB:
-            value = reversed(value)
+            value = bytes(reversed(value))
 
         return cls(value=bytes(value))
 
@@ -1076,6 +1098,11 @@ class String(str, Type):
         order: ByteOrder = ByteOrder.MSB,
         encoding: Encoding = None,
     ):
+        if not isinstance(self, String):
+            raise TypeError(
+                "Ensure the 'encode' method is being called on a class instance!"
+            )
+
         if encoding is None:
             encoding = self.encoding
         elif not isinstance(encoding, Encoding):
@@ -1201,7 +1228,7 @@ class BytesView(object):
 
         if not isinstance(split, int):
             raise TypeError("The 'split' argument must have a positive integer value!")
-        elif 1 <= split < self._size:
+        elif 1 <= split <= self._size:
             self._splits = split
         else:
             raise ValueError(
@@ -1221,11 +1248,11 @@ class BytesView(object):
         else:
             return math.floor(parts)
 
-    def __iter__(self) -> bytesview:
+    def __iter__(self) -> BytesView:
         self._index = 0
         return self
 
-    def __next__(self) -> bytes | object:
+    def __next__(self) -> bytearray | object:
         if self._index + self._splits > self._size:
             raise StopIteration
 
@@ -1242,7 +1269,7 @@ class BytesView(object):
         return value
 
     def __getitem__(self, index: int | slice) -> bytearray | object:
-        # logger.debug("%s.__getitem__(index: %r)" % (self.__class__.__name__, index))
+        logger.debug("%s.__getitem__(index: %r)", self.__class__.__name__, index)
 
         maxindex: int = math.floor(self._size / self._splits) - 1
         reverse: bool = False
@@ -1397,6 +1424,7 @@ class BytesView(object):
                     self.type,
                     typed,
                 )
+
                 return typed
 
     def split(self, split: int = None) -> BytesView:
@@ -1529,6 +1557,11 @@ class BytesView(object):
         The format string does not need to be long enough to decode all of the data held
         in the BytesView, but if the format string specifies more data types than held
         in the data, an error will be raised."""
+
+        if not isinstance(self, BytesView):
+            raise TypeError(
+                "Ensure the 'decode' method is being called on a class instance!"
+            )
 
         if not isinstance(format, str):
             raise TypeError("The 'format' argument must have a string value!")

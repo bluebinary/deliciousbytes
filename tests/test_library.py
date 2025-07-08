@@ -51,7 +51,7 @@ from deliciousbytes import (
     ASCII,
 )
 
-from conftest import print_hexbytes
+from deliciousbytes.utilities import print_hexbytes
 
 
 def test_byte_order_enumeration():
@@ -518,6 +518,28 @@ def test_unsigned_long():
     encoded: bytes = value.encode(order=ByteOrder.LittleEndian)
     assert isinstance(encoded, bytes)
     assert encoded == b"\x7f\x00\x00\x00"
+
+    # 5848 in big   endian is \x16\xd8
+    # 5848 in litte endian is \xd8\x16
+
+    data: Bytes = Bytes.decode(b"\xd8\x16", order=ByteOrder.LSB)
+    assert isinstance(data, Bytes)
+    assert data == b"\x16\xd8"  # Bytes.decode() flips the bytes to MSB order
+
+    decoded: UInt32 = UInt32.decode(data)
+    assert isinstance(decoded, UInt32)
+    assert isinstance(decoded, int)
+    assert decoded == 5848
+
+    decoded: UInt64 = UInt64.decode(data)
+    assert isinstance(decoded, UInt64)
+    assert isinstance(decoded, int)
+    assert decoded == 5848
+
+    decoded: UnsignedLong = UnsignedLong.decode(data)
+    assert isinstance(decoded, UnsignedLong)
+    assert isinstance(decoded, int)
+    assert decoded == 5848
 
 
 def test_signed_long():
