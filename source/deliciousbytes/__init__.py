@@ -986,7 +986,7 @@ class Bytes(bytes, Type):
         self = super().__new__(cls, value)
 
         if length is None:
-            pass
+            self._length: int = 0
         elif isinstance(length, int) and length >= 1:
             self._length: int = length
         else:
@@ -1026,14 +1026,14 @@ class Bytes(bytes, Type):
                 # logger.debug("%s.encode(order: MSB) index => %s, byte => %s (%x)", self.__class__.__name__, index, byte, byte)
                 encoded.append(byte)
 
-            while len(encoded) < length:
+            while length > 0 and len(encoded) < length:
                 encoded.insert(0, 0)
         elif order is ByteOrder.LSB:
             for index, byte in enumerate(reversed(self)):
                 # logger.debug("%s.encode(order: LSB) index => %s, byte => %s (%x)", self.__class__.__name__, index, byte, byte)
                 encoded.append(byte)
 
-            while len(encoded) < length:
+            while length > 0 and len(encoded) < length:
                 encoded.append(0)
 
         if raises is True and self.length and len(encoded) > self.length:
