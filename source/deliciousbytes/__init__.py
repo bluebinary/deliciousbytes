@@ -986,7 +986,8 @@ class Bytes(bytes, Type):
         self = super().__new__(cls, value)
 
         if length is None:
-            self._length: int = 0
+            if self._length is None:
+                self._length: int = 0
         elif isinstance(length, int) and length >= 1:
             self._length: int = length
         else:
