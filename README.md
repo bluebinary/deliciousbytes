@@ -72,7 +72,7 @@ assert encoded == b"\x7f"
 The DeliciousBytes library provides the following data type classes, all of which are
 ultimately a subclass of one of the native Python data type classes so all instances of
 the classes below can be used interchangeably with their native Python data types; each
-data type class is also a subclasses of the `deliciousbytes.Type` superclass, from which
+data type class is also a subclass of the `deliciousbytes.Type` superclass, from which
 they inherit shared behaviour and class hierarchy membership:
 
 | Class              | Description                            | Subclass Of | Format   |
@@ -152,6 +152,16 @@ binary encoded value provided via a `bytes` data type value, and decodes the val
 its native data type value. The byte order defaults to most-significant bit first, and
 is represented by the `ByteOrder` enumeration class which provides enumeration options
 to specify the endianness that is needed for the use case.
+
+Furthermore, the `Bytes` type and it subtypes, `Bytes8`, `Bytes16`, `Bytes32`, `Bytes64`,
+`Bytes128`, and `Bytes256` offer a `reverse` (`bool`) keyword argument that can be used to
+reverse the order of bytes from those provided, as in the case of the `Bytes` type and 
+its subtypes, the classes expect to hold one or more individual bytes, were the order
+of the bytes is not expected to affect the encoding of the underlying data, and as such
+the value of the 'order' keyword argument, has no impact. Where it is useful to reverse
+the order of the bytes being held, the `reverse` keyword argument can be set to `True`,
+causing the order of the individual bytes to be reversed into the opposite order to that
+in which they were provided.
 
 The `deliciousbytes` class also provides a `ByteView` class which provides a method for
 iterating over bytes, either as individual bytes or in groups of bytes of the specified
@@ -286,13 +296,102 @@ assert view.decode(">hhh") == (1, 2, 3)
 assert view.decode(">hhhh") == (1, 2, 3, 4)
 ```
 
+<a id='utility-functions'></a>
+### Utility Functions
+
+The DeliciousBytes library provides the following utility functions which are useful for
+debugging and integration:
+
+ * `hexbytes(value: bytes, prefix: bool = False, limit: int = 0)` (`str`) – The `hexbytes()`
+ function takes a `bytes` value as input and generates a string representation of the value,
+ that can be printed or stored and later reviewed. The output is primarily useful for
+ debugging purposes to help visualise raw byte data.
+ 
+ 
+ An example of the `hexbytes()` function's use is as follows:
+ 
+ ```python
+ from deliciousbytes.utilities import hexbytes
+
+ value: bytes = b"\x01\x02\x03\x04\x05\x06"
+
+ assert hexbytes(value) == "[> 01 02 03 04 05 06 <]"
+ ```
+
+ The optional `prefix` option changes the output to look like a formatted bytes string:
+
+ ```python
+ from deliciousbytes.utilities import hexbytes
+
+ value: bytes = b"\x01\x02\x03\x04\x05\x06"
+
+ assert hexbytes(value, prefix=True) == r'b"\x01\x02\x03\x04\x05\x06"'
+ ```
+
+ The optional `limit` option, limits how many bytes are included in the output:
+
+ ```python
+ from deliciousbytes.utilities import hexbytes
+
+ value: bytes = b"\x01\x02\x03\x04\x05\x06"
+
+ assert hexbytes(value, limit=4) == "[> 01 02 03 04 ... <]"
+ ```
+ 
+ * `print_hexbytes` – The `print_hexbytes()` function takes a `bytes` value as input and
+ generates and prints a string representation of the value. The output is primarily useful for
+ debugging purposes to help visualise raw byte data.
+ 
+ An example of the `print_hexbytes()` function's use is as follows:
+ 
+ ```python
+ from deliciousbytes.utilities import print_hexbytes
+ 
+ value: bytes = b"\x01\x02\x03\x04\x05\x06"
+ 
+ print_hexbytes(value, limit=4)
+ ```
+ 
+ The above code outputs the following:
+ 
+ ```text
+ [> 01 02 03 04 ... <]
+ ```
+ 
+ * `isinstantiable(value: object, klass: type)` (`bool`) – The `isinstantiable()`
+ function takes an `object` value, of any class, and a type class reference, and based
+ on the class type or superclass types of the type class reference, determines if the
+ value can be instantiated into an instance of the referenced type class. For example,
+ if a string value is provided, and the type class reference references a class that is
+ a subclass of the `str` type, then the function will return `True` otherwise `False`.
+ 
+ An example of the `isinstantiable()` function's use is as follows:
+ 
+ ```python
+ from deliciousbytes import String, ASCII, UTF8
+ from deliciousbytes.utilities import isinstantiable
+ 
+ value: str = "Hello World"
+ 
+ assert isinstantiable(value, str)
+ assert isinstantiable(value, String)
+ assert isinstantiable(value, ASCII)
+ assert isinstantiable(value, UTF8)
+ ```
+ 
+ The above code outputs the following:
+ 
+ ```text
+ [> 01 02 03 04 ... <]
+ ```
+
 <a id='byte-order'></a>
 ### Byte Order
 
 The byte order for each of the data type classes defaults to most-significant bit first,
 MSB, but may be changed to least-significant bit first, LSB, if needed. The `ByteOrder`
-enumeration class value offers enumeration options to specify the endianness that is
-needed for the use case, and for convenience provides the enumerations in a few flavours
+enumeration class value offers enumeration options to specify the endianness needed for
+a given use case, and for convenience provides the enumerations in a few naming flavours
 depending on how one prefers to refer to endianness:
 
 | Enumeration Option             | Byte Order | Endianness |

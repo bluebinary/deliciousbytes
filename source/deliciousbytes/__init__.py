@@ -998,8 +998,20 @@ class Bytes(bytes, Type):
         return self
 
     def encode(
-        self, order: ByteOrder = ByteOrder.MSB, length: int = None, raises: bool = True
+        self,
+        order: ByteOrder = ByteOrder.MSB,
+        reverse: bool = False,
+        length: int = None,
+        raises: bool = True,
     ) -> bytes:
+        """The encode method encodes the provided bytes into a bytes type, padding the
+        value up to the specified length. The byte order is ignored as the Bytes type
+        holds one of more individual bytes, similar to the ASCII type, where the values
+        being encoded already fit within single bytes so byte order has no impact. If
+        there is the need to reverse the order of the bytes, this can be achieved via
+        the 'reverse' argument, which defaults to False, but can be set to True to sort
+        and encode the bytes in reverse order."""
+
         if not isinstance(self, Bytes):
             raise TypeError(
                 "Ensure the 'encode' method is being called on a class instance!"
@@ -1009,6 +1021,9 @@ class Bytes(bytes, Type):
             raise TypeError(
                 "The 'order' argument must have a ByteOrder enumeration value!"
             )
+
+        if not isinstance(reverse, bool):
+            raise TypeError("The 'reverse' argument must have a boolean value!")
 
         if length is None:
             length = self._length
@@ -1022,14 +1037,14 @@ class Bytes(bytes, Type):
 
         encoded: bytesarray = bytearray()
 
-        if order is ByteOrder.MSB:
+        if reverse is False:
             for index, byte in enumerate(self):
                 # logger.debug("%s.encode(order: MSB) index => %s, byte => %s (%x)", self.__class__.__name__, index, byte, byte)
                 encoded.append(byte)
 
             while length > 0 and len(encoded) < length:
                 encoded.insert(0, 0)
-        elif order is ByteOrder.LSB:
+        elif reverse is True:
             for index, byte in enumerate(reversed(self)):
                 # logger.debug("%s.encode(order: LSB) index => %s, byte => %s (%x)", self.__class__.__name__, index, byte, byte)
                 encoded.append(byte)
@@ -1046,13 +1061,33 @@ class Bytes(bytes, Type):
         return bytes(encoded)
 
     @classmethod
-    def decode(cls, value: bytes | bytearray, order: ByteOrder = None) -> Bytes:
+    def decode(
+        cls,
+        value: bytes | bytearray,
+        order: ByteOrder = ByteOrder.MSB,
+        reverse: bool = False,
+    ) -> Bytes:
+        """The decode method decodes the provided value into a Bytes type; the byte
+        order is ignored as the Bytes type holds one of more individual bytes, similar
+        to the ASCII type, where the values being encoded already fit within single
+        bytes so byte order has no impact. If there is the need to reverse the order of
+        the bytes, this can be achieved via the 'reverse' argument, which defaults to
+        False, but can be set to True to sort and decode the bytes in reverse order."""
+
         if not isinstance(value, (bytes, bytearray)):
             raise TypeError(
                 "The 'value' argument must have a bytes or bytearray value!"
             )
 
-        if order is ByteOrder.LSB:
+        if not isinstance(order, ByteOrder):
+            raise TypeError(
+                "The 'order' argument must have a ByteOrder enumeration value!"
+            )
+
+        if not isinstance(reverse, bool):
+            raise TypeError("The 'reverse' argument must have a boolean value!")
+
+        if reverse is True:
             value = bytes(reversed(value))
 
         return cls(value=bytes(value))
