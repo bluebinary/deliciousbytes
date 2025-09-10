@@ -999,7 +999,7 @@ class Bytes(bytes, Type):
 
     def encode(
         self,
-        order: ByteOrder = ByteOrder.MSB,
+        order: ByteOrder = None,
         reverse: bool = False,
         length: int = None,
         raises: bool = True,
@@ -1017,9 +1017,11 @@ class Bytes(bytes, Type):
                 "Ensure the 'encode' method is being called on a class instance!"
             )
 
-        if not isinstance(order, ByteOrder):
+        if order is None:
+            pass
+        elif not isinstance(order, ByteOrder):
             raise TypeError(
-                "The 'order' argument must have a ByteOrder enumeration value!"
+                "The 'order' argument, if specified, must have a ByteOrder enumeration value!"
             )
 
         if not isinstance(reverse, bool):
@@ -1064,7 +1066,7 @@ class Bytes(bytes, Type):
     def decode(
         cls,
         value: bytes | bytearray,
-        order: ByteOrder = ByteOrder.MSB,
+        order: ByteOrder = None,
         reverse: bool = False,
     ) -> Bytes:
         """The decode method decodes the provided value into a Bytes type; the byte
@@ -1079,9 +1081,11 @@ class Bytes(bytes, Type):
                 "The 'value' argument must have a bytes or bytearray value!"
             )
 
-        if not isinstance(order, ByteOrder):
+        if order is None:
+            pass
+        elif not isinstance(order, ByteOrder):
             raise TypeError(
-                "The 'order' argument must have a ByteOrder enumeration value!"
+                "The 'order' argument, if specified, must have a ByteOrder enumeration value!"
             )
 
         if not isinstance(reverse, bool):
