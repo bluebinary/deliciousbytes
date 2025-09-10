@@ -1,5 +1,11 @@
 # DeliciousBytes Library Change Log
 
+## [1.1.1] - 2025-09-09
+### Changed
+- The `Bytes.encode()` and the `Bytes.decode()` methods now treat the `order` keyword
+argument as optional, with a default value of `None`, although if it is specified, it
+must reference a `ByteOrder` enumeration option.
+
 ## [1.1.0] - 2025-09-09
 ### Added
 - The `Bytes.encode()` and the `Bytes.decode()` methods now support reversing the order
