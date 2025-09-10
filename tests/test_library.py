@@ -522,9 +522,9 @@ def test_unsigned_long():
     # 5848 in big   endian is \x16\xd8
     # 5848 in litte endian is \xd8\x16
 
-    data: Bytes = Bytes.decode(b"\xd8\x16", order=ByteOrder.LSB)
+    data: Bytes = Bytes.decode(b"\xd8\x16", reverse=True)
     assert isinstance(data, Bytes)
-    assert data == b"\x16\xd8"  # Bytes.decode() flips the bytes to MSB order
+    assert data == b"\x16\xd8"  # Bytes.decode(reverse=True) reverses the order of bytes
 
     decoded: UInt32 = UInt32.decode(data)
     assert isinstance(decoded, UInt32)
@@ -820,17 +820,29 @@ def test_float64():
     assert math.isclose(decoded, 127.987)
 
 
+def test_bytes():
+    """Test the Bytes data type which is an unlimited length, 8-bit byte type."""
+
+    value: Bytes = Bytes(bytearray([0x01, 0x02, 0x03, 0x04, 0x05]))
+
+    assert isinstance(value, Bytes)
+    assert isinstance(value, bytes)
+
+    encoded: bytes = value.encode(order=ByteOrder.MSB)
+    assert isinstance(encoded, bytes)
+    assert len(encoded) == 5
+    assert encoded == b"\x01\x02\x03\x04\x05"
+
+    encoded: bytes = value.encode(order=ByteOrder.LSB)
+    assert isinstance(encoded, bytes)
+    assert len(encoded) == 5
+    assert encoded == b"\x01\x02\x03\x04\x05"
+
+
 def test_bytes8():
     """Test the Bytes8 data type which is a fixed 1-byte, 8-bit bytes type."""
 
-    value: UInt8 = UInt8(50)
-
-    assert isinstance(value, UInt8)
-    assert isinstance(value, UInt)
-    assert isinstance(value, Int)
-    assert isinstance(value, int)
-
-    value: Bytes8 = Bytes8(bytearray([byte for byte in bytes(value)]))
+    value: Bytes8 = Bytes8(bytearray([0x01]))
 
     assert isinstance(value, Bytes8)
     assert isinstance(value, Bytes)
@@ -839,25 +851,18 @@ def test_bytes8():
     encoded: bytes = value.encode(order=ByteOrder.MSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 1  # 1 byte, 8-bits
-    assert encoded == b"\x32"
+    assert encoded == b"\x01"
 
     encoded: bytes = value.encode(order=ByteOrder.LSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 1  # 1 byte, 8-bits
-    assert encoded == b"\x32"
+    assert encoded == b"\x01"
 
 
 def test_bytes16():
     """Test the Bytes16 data type which is a fixed 2-byte, 16-bit bytes type."""
 
-    value: UInt8 = UInt8(50)
-
-    assert isinstance(value, UInt8)
-    assert isinstance(value, UInt)
-    assert isinstance(value, Int)
-    assert isinstance(value, int)
-
-    value: Bytes16 = Bytes16(bytearray([byte for byte in bytes(value)]))
+    value: Bytes16 = Bytes16(bytearray([0x01, 0x02]))
 
     assert isinstance(value, Bytes16)
     assert isinstance(value, Bytes)
@@ -866,25 +871,18 @@ def test_bytes16():
     encoded: bytes = value.encode(order=ByteOrder.MSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 2  # 2 bytes, 16-bits
-    assert encoded == b"\x00\x32"
+    assert encoded == b"\x01\x02"
 
     encoded: bytes = value.encode(order=ByteOrder.LSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 2  # 2 bytes, 16-bits
-    assert encoded == b"\x32\x00"
+    assert encoded == b"\x01\x02"
 
 
 def test_bytes32():
-    """Test the Bytes64 data type which is a fixed 4-byte, 32-bit bytes type."""
+    """Test the Bytes32 data type which is a fixed 4-byte, 32-bit bytes type."""
 
-    value: UInt16 = UInt16(40050)
-
-    assert isinstance(value, UInt16)
-    assert isinstance(value, UInt)
-    assert isinstance(value, Int)
-    assert isinstance(value, int)
-
-    value: Bytes32 = Bytes32(bytearray([byte for byte in bytes(value)]))
+    value: Bytes32 = Bytes32(bytearray([0x01, 0x02, 0x03, 0x04]))
 
     assert isinstance(value, Bytes32)
     assert isinstance(value, Bytes)
@@ -893,25 +891,20 @@ def test_bytes32():
     encoded: bytes = value.encode(order=ByteOrder.MSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 4  # 4 bytes, 32-bits
-    assert encoded == b"\x00\x00\x9c\x72"
+    assert encoded == b"\x01\x02\x03\x04"
 
     encoded: bytes = value.encode(order=ByteOrder.LSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 4  # 4 bytes, 32-bits
-    assert encoded == b"\x72\x9c\x00\x00"
+    assert encoded == b"\x01\x02\x03\x04"
 
 
 def test_bytes64():
     """Test the Bytes64 data type which is a fixed 8-byte, 64-bit bytes type."""
 
-    value: UInt32 = UInt32(4000050)
-
-    assert isinstance(value, UInt32)
-    assert isinstance(value, UInt)
-    assert isinstance(value, Int)
-    assert isinstance(value, int)
-
-    value: Bytes64 = Bytes64(bytearray([byte for byte in bytes(value)]))
+    value: Bytes64 = Bytes64(
+        bytearray([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+    )
 
     assert isinstance(value, Bytes64)
     assert isinstance(value, Bytes)
@@ -920,12 +913,12 @@ def test_bytes64():
     encoded: bytes = value.encode(order=ByteOrder.MSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 8  # 8 bytes, 64-bits
-    assert encoded == b"\x00\x00\x00\x00\x00\x3d\x09\x32"
+    assert encoded == b"\x01\x02\x03\x04\x05\x06\x07\x08"
 
     encoded: bytes = value.encode(order=ByteOrder.LSB)
     assert isinstance(encoded, bytes)
     assert len(encoded) == 8  # 8 bytes, 64-bits
-    assert encoded == b"\x32\x09\x3d\x00\x00\x00\x00\x00"
+    assert encoded == b"\x01\x02\x03\x04\x05\x06\x07\x08"
 
 
 def test_string():
